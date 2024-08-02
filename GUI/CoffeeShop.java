@@ -1,61 +1,58 @@
 package GUI;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 
 public class CoffeeShop extends JFrame {
-    private static String[] items = { "Americano ", "Latte     ", "Cappuccino", "Espresso  ", "Arabica   ",
+    private static final String[] items = { "Americano ", "Latte     ", "Cappuccino", "Espresso  ", "Arabica   ",
             "Mochaccino", "Tiramisu  ", "Robusta   ", "Liberica  ", "Excelso   ", "Affogato  " };
-    private static int[] prices = { 21, 24, 29, 19, 23, 33, 33, 30, 66, 95, 34 };
-    private static int[] orders = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    final private Font westButtonFont = new Font("Georgia", Font.PLAIN, 20);
-    double cost, finalCost;
-    boolean isDiscount;
-    JLabel lRawCost, lIsDiscount, lFinalCost;
+    private static final int[] prices = { 21, 24, 29, 19, 23, 33, 33, 30, 66, 95, 34 };
+    private static final int[] orders = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    static double cost, finalCost;
+    static boolean isDiscount;
+    static JLabel lRawCost, lIsDiscount, lFinalCost;
     JLabel[] tfCount;
-    String discount;
+    static String discount;
 
     CoffeeShop() {
+        final Font westButtonFont = new Font("Georgia", Font.PLAIN, 20);
         JPanel pCF = new JPanel();
         cost = 0;
         isDiscount = false;
         pCF.setLayout(new BorderLayout(20, 15));
 
-        /******************************** NORTH *********************************/
+        /* ******************************* NORTH ******************************** */
         JLabel lWelcome = new JLabel("*If your purchase reach Rp.100K, you will get a 15% discount!");
         lWelcome.setFont(new Font("MS Serif", Font.BOLD, 14));
         JPanel pNorth = new JPanel();
         pNorth.add(lWelcome);
         pCF.add(pNorth, BorderLayout.NORTH);
 
-        /********************************* WEST *********************************/
+        /* ******************************** WEST ******************************** */
         JButton bPurchase = new JButton("Purchase");
         bPurchase.setFont(westButtonFont);
-        bPurchase.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                update();
-                boolean orderListIsEmpty = true;
-                for (int i = 0; i < items.length; i++) {
-                    if (orders[i] != 0) {
-                        orderListIsEmpty = false;
-                        break;
-                    }
+        bPurchase.addActionListener(e -> {
+            update();
+            boolean orderListIsEmpty = true;
+            for (int i = 0; i < items.length; i++) {
+                if (orders[i] != 0) {
+                    orderListIsEmpty = false;
+                    break;
                 }
-                if (!orderListIsEmpty) {new Transaction();}
-                reset();
             }
+            if (!orderListIsEmpty) {new Transaction();}
+            reset();
         });
         JButton bReset = new JButton("Reset");
         bReset.setFont(westButtonFont);
-        bReset.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent e) {reset();}});
+        bReset.addActionListener(e -> reset());
         JPanel pWest = new JPanel();
         pWest.add(bPurchase);
         pWest.add(bReset);
         pWest.setLayout(new GridLayout(2, 1));
         pCF.add(pWest, BorderLayout.WEST);
 
-        /******************************** CENTER ********************************/
+        /* ******************************* CENTER ******************************* */
         JLabel lItem;
         JLabel lPrice;
         JLabel lItemList = new JLabel("Menu:");
@@ -72,7 +69,7 @@ public class CoffeeShop extends JFrame {
         pCenter.setLayout(new GridLayout((items.length + 1), 2, 30, 0));
         pCF.add(pCenter, BorderLayout.CENTER);
 
-        /********************************* EAST *********************************/
+        /* ******************************** EAST ******************************** */
         JPanel pEast = new JPanel();
         JLabel lOrder = new JLabel("Orders:");
         pEast.add(lOrder);
@@ -88,25 +85,21 @@ public class CoffeeShop extends JFrame {
             tfCount[i] = new JLabel("0");
             pEast.add(tfCount[i]);
             bReduce[i] = new JButton("-");
-            bReduce[i].addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent k) {
-                    tfCount[id].setText(Integer.toString(Integer.parseInt(tfCount[id].getText()) - 1));
-                    orders[id]--;
-                    if (Integer.parseInt(tfCount[id].getText()) < 0) {
-                        tfCount[id].setText("0");
-                        orders[id] = 0;
-                    }
-                    update();
+            bReduce[i].addActionListener(k -> {
+                tfCount[id].setText(Integer.toString(Integer.parseInt(tfCount[id].getText()) - 1));
+                orders[id]--;
+                if (Integer.parseInt(tfCount[id].getText()) < 0) {
+                    tfCount[id].setText("0");
+                    orders[id] = 0;
                 }
+                update();
             });
             pEast.add(bReduce[i]);
             bIncrease[i] = new JButton("+");
-            bIncrease[i].addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    tfCount[id].setText(Integer.toString(Integer.parseInt(tfCount[id].getText()) + 1));
-                    orders[id]++;
-                    update();
-                }
+            bIncrease[i].addActionListener(e -> {
+                tfCount[id].setText(Integer.toString(Integer.parseInt(tfCount[id].getText()) + 1));
+                orders[id]++;
+                update();
             });
             pEast.add(bIncrease[i]);
         }
@@ -114,30 +107,36 @@ public class CoffeeShop extends JFrame {
         pEast.setMaximumSize(new Dimension(225, 800));
         pCF.add(pEast, BorderLayout.EAST);
 
-        /******************************** SOUTH *********************************/
+        /* ******************************* SOUTH ******************************** */
         JPanel pSouth = new JPanel();
         // Price
+        JPanel pPrice = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JLabel lTotalPrice = new JLabel("Total Price:");
-        pSouth.add(lTotalPrice);
+        pPrice.add(lTotalPrice);
         lRawCost = new JLabel("Rp. " + nice(cost) + "K");
-        pSouth.add(lRawCost);
+        pPrice.add(lRawCost);
+        pSouth.add(pPrice);
         // Discount
+        JPanel pDiscount = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JLabel lDiscountState = new JLabel("Discount:");
-        pSouth.add(lDiscountState);
+        pDiscount.add(lDiscountState);
         String discount = (isDiscount) ? "15%" : "None";
         lIsDiscount = new JLabel(discount);
-        pSouth.add(lIsDiscount);
+        pDiscount.add(lIsDiscount);
+        pSouth.add(pDiscount);
         // Final Cost
+        JPanel pCost = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JLabel lFinalCostStatement = new JLabel("Final Cost:");
-        pSouth.add(lFinalCostStatement);
+        pCost.add(lFinalCostStatement);
         double finalCost = (isDiscount) ? cost * 0.85 : cost;
         lFinalCost = new JLabel("Rp. " + nice(finalCost) + "K");
-        pSouth.add(lFinalCost);
+        pCost.add(lFinalCost);
+        pSouth.add(pCost);
         // The rest
-        pSouth.setLayout(new GridLayout(3, 2));
+        pSouth.setLayout(new GridLayout(3, 1));
         pCF.add(pSouth, BorderLayout.SOUTH);
 
-        /******************************** FRAME *********************************/
+        /* ******************************* FRAME ******************************** */
         add(pCF);
         setSize(600, 400);
         setMinimumSize(new Dimension(600, 400));
@@ -148,23 +147,21 @@ public class CoffeeShop extends JFrame {
         setVisible(true);
     }
 
-    void update() {
+    static void update() {
         cost = 0;
         for (int i = 0; i < items.length; i++) {cost += orders[i] * prices[i];}
         lRawCost.setText("Rp. " + nice(cost) + "K");
-        if (cost >= 100) {isDiscount = true;} else {isDiscount = false;}
+        isDiscount = cost >= 100;
         discount = (isDiscount) ? "15%" : "None";
         lIsDiscount.setText(discount);
         finalCost = (isDiscount) ? cost * 0.85 : cost;
         lFinalCost.setText("Rp. " + nice(finalCost) + "K");
     }
-    String nice(double cc) {
-        String res = (cc % 1 == 0) ? String.format("%.0f", cc) : String.format("%.1f", cc);
-        return res;
+    static String nice(double cc) {
+        return (cc % 1 == 0) ? String.format("%.0f", cc) : String.format("%.1f", cc);
     }
     String noSpace(String ns) {
-        String res = ns.replaceAll(" ", "");
-        return res;
+        return ns.replaceAll(" ", "");
     }
     void reset() {
         cost = 0;
@@ -179,9 +176,9 @@ public class CoffeeShop extends JFrame {
 
         Transaction() {
             setLayout(new BorderLayout());
-            /******************************** NORTH *********************************/
+            /* ******************************* NORTH ******************************** */
             // Upper Half
-            ImageIcon iiVolgion = new ImageIcon("Images/VOLGION-NOBG.png");
+            ImageIcon iiVolgion = new ImageIcon("Images/Volgion Logo.png");
             JLabel lVolgion = new JLabel(iiVolgion);
             JPanel pUpperNorth = new JPanel();
             pUpperNorth.add(lVolgion);
@@ -202,13 +199,13 @@ public class CoffeeShop extends JFrame {
             pNorth.add(lThanks);
             pNorth.setLayout(new GridLayout(3, 1));
 
-            /********************************* WEST *********************************/ 
+            /* ******************************** WEST ******************************** */
             JPanel pWest = new JPanel();
 
-            /******************************** CENTER ********************************/
+            /* ******************************* CENTER ******************************* */
             // Items list
             int orderCount = 0;
-            for (int i = 0; i < orders.length; i++) {if (orders[i] > 0) {orderCount++;}}
+            for (int order : orders) if (order > 0) orderCount++;
             JPanel pCenter = new JPanel();
             JLabel lItem = new JLabel("Purchased:");
             pCenter.add(lItem);
@@ -226,18 +223,20 @@ public class CoffeeShop extends JFrame {
                     pCenter.add(lItems[id]);
                     lCounts[id] = new JLabel(Integer.toString(orders[i]));
                     pCenter.add(lCounts[id]);
-                    lPrices[id] = new JLabel(Integer.toString(prices[i]) + "K");
+                    lPrices[id] = new JLabel(prices[i] + "K");
                     pCenter.add(lPrices[id]);
                     id++;
                 }
             }
             // Total
+            JPanel pTotal = new JPanel(new FlowLayout(FlowLayout.CENTER));
             JLabel lLTotal = new JLabel("Total:");
-            pCenter.add(lLTotal);
+            pTotal.add(lLTotal);
             int sum = 0;
             for(int i = 0; i < orders.length; i++) {sum += prices[i]*orders[i];}
             JLabel lRTotal = new JLabel(Integer.toString(sum));
-            pCenter.add(lRTotal);
+            pTotal.add(lRTotal);
+            pCenter.add(pTotal);
             // Discount
             JLabel lLDiscount = new JLabel("Discount:");
             pCenter.add(lLDiscount);
@@ -248,20 +247,20 @@ public class CoffeeShop extends JFrame {
             // Price
             JLabel lLPrice = new JLabel("Price:");
             pCenter.add(lLPrice);
-            update();
+            CoffeeShop.update();
             JLabel lRPrice = new JLabel(String.format("%.1f", finalCost));
             pCenter.add(lRPrice);
 
             pCenter.setLayout(new GridLayout(orderCount+1+3, 2));
 
-            /********************************* EAST *********************************/
+            /* ******************************** EAST ******************************** */
             JPanel pEast = new JPanel();
             
 
-            /******************************** SOUTH *********************************/
+            /* ******************************* SOUTH ******************************** */
             // JPanel pSouth = new JPanel();
 
-            /******************************** FRAME *********************************/
+            /* ******************************* FRAME ******************************** */
             add(pNorth, BorderLayout.NORTH);
             add(pWest, BorderLayout.WEST);
             add(pCenter, BorderLayout.CENTER);
@@ -272,20 +271,13 @@ public class CoffeeShop extends JFrame {
             setVisible(true);
             setTitle("Volgion Coffee Shop Struck");
         }
-
-        void update() {
-            cost = 0;
-            for (int i = 0; i < items.length; i++) {cost += orders[i] * prices[i];}
-            lRawCost.setText("Rp. " + nice(cost) + "K");
-            if (cost >= 100) {isDiscount = true;} else {isDiscount = false;}
-            discount = (isDiscount) ? "15%" : "None";
-            lIsDiscount.setText(discount);
-            finalCost = (isDiscount) ? cost * 0.85 : cost;
-            lFinalCost.setText("Rp. " + nice(finalCost) + "K");
-        }
     }
 
     public static void main(String[] args) {
+        // TODO: Add Login Page
         new CoffeeShop();
+        // TODO: Integrate database for purchase history
+        // TODO: Display history
+        // TODO:
     }
 }
